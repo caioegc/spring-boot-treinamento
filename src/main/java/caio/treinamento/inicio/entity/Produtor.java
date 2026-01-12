@@ -4,25 +4,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Heroe {
+public class Produtor {
   private long id;
   private String nome;
-  public static List<Heroe> list = new ArrayList<>();
+  public static List<Produtor> list = new ArrayList<>();
 
   static {
-    var naruto = new Heroe(1L, "Naruto");
-    var dragonball = new Heroe(2L, "Goku");
-    var onePiece = new Heroe(3L, "Luffy");
+    var naruto = new Produtor(1L, "Naruto");
+    var dragonball = new Produtor(2L, "Goku");
+    var onePiece = new Produtor(3L, "Luffy");
     list.addAll(List.of(naruto, dragonball, onePiece));
   }
 
 
-    public Heroe(long id, String nome) {
+    public Produtor(long id, String nome) {
         this.id = id;
         this.nome = nome;
     }
 
-    public static List<Heroe> heroeList() {
+    public static List<Produtor> heroeList() {
       return list;
 
     }
