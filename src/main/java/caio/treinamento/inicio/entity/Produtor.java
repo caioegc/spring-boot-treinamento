@@ -10,10 +10,10 @@ public class Produtor {
   public static List<Produtor> list = new ArrayList<>();
 
   static {
-    var naruto = new Produtor(1L, "Naruto");
-    var dragonball = new Produtor(2L, "Goku");
-    var onePiece = new Produtor(3L, "Luffy");
-    list.addAll(List.of(naruto, dragonball, onePiece));
+    var mappa = new Produtor(1L, "Mappa");
+    var kyotoAnimattion = new Produtor(2L, "Kyoto Animattion");
+    var mandhouse = new Produtor(3L, "Mandhouse");
+    list.addAll(List.of(mappa, kyotoAnimattion, mandhouse));
   }
 
 
@@ -22,7 +22,7 @@ public class Produtor {
         this.nome = nome;
     }
 
-    public static List<Produtor> heroeList() {
+    public static List<Produtor> produtorList() {
       return list;
 
     }
