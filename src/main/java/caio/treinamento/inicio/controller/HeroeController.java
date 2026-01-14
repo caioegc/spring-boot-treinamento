@@ -1,8 +1,13 @@
 package caio.treinamento.inicio.controller;
 
 import caio.treinamento.inicio.entity.Heroe;
+import caio.treinamento.inicio.producer.HeroePostRequest;
+import caio.treinamento.inicio.response.HeroeGetRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -28,10 +33,21 @@ public class HeroeController {
     }
 
     @PostMapping
-    public Heroe save (@RequestBody Heroe heroe){
-        heroe.setId(ThreadLocalRandom.current().nextLong(1000));
-        Heroe.heroeList().add(heroe);
-        return heroe;
+    public ResponseEntity<HeroeGetRequest> save (@RequestBody HeroePostRequest heroePostRequest){
+        Heroe build = Heroe.builder()
+                .id(ThreadLocalRandom.current().nextLong(1000))
+                .nome(heroePostRequest.getNome())
+                .atDate(LocalDateTime.now())
+                .build();
+
+        HeroeGetRequest build1 = HeroeGetRequest
+                .builder()
+                .id(build.getId())
+                .nome(build.getNome())
+                .atDate(build.getAtDate())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(build1);
 
     }
 
