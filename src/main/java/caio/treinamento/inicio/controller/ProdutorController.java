@@ -1,6 +1,7 @@
 package caio.treinamento.inicio.controller;
 
 import caio.treinamento.inicio.entity.Produtor;
+import caio.treinamento.inicio.mapper.ProducerMapper;
 import caio.treinamento.inicio.producer.ProducerPostRequest;
 import caio.treinamento.inicio.response.ProducerGetResponse;
 import org.springframework.http.HttpStatus;
@@ -15,7 +16,7 @@ import java.util.concurrent.ThreadLocalRandom;
 @RequestMapping("v1/produtor")
 public class ProdutorController {
 
-
+    public static ProducerMapper MAPPER = ProducerMapper.INSTANCE;
     @GetMapping
     public List<Produtor> findByAll(@RequestParam(required = false) String nome) {
         var produto = Produtor.produtorList();
@@ -34,21 +35,11 @@ public class ProdutorController {
 
     @PostMapping()
     public ResponseEntity<ProducerGetResponse> save(@RequestBody ProducerPostRequest producerPostRequest) {
-        var build = Produtor.builder()
-                .id(ThreadLocalRandom.current().nextLong(1000))
-                .nome(producerPostRequest.getNome())
-                .createdAt(LocalDateTime.now())
-                .build();
+        var produtor = MAPPER.paraProdutor(producerPostRequest);
+        var produtor2 = MAPPER.paraGetResponse(produtor);
 
-        Produtor.produtorList().add(build);
-
-        var build1 = ProducerGetResponse.builder()
-                .id(build.getId())
-                .nome(build.getNome())
-                .createdAt(build.getCreatedAt())
-                .build();
-
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(build1);
+        Produtor.produtorList().add(produtor);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(produtor2);
 
     }
 
