@@ -7,6 +7,7 @@ import caio.treinamento.inicio.response.ProducerGetResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -51,6 +52,20 @@ public class ProdutorController {
 
         Produtor.produtorList().add(produtor);
         return ResponseEntity.status(HttpStatus.CREATED).body(produtor2);
+
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Produtor> produtor(@PathVariable Long id){
+
+        var produtor = Produtor.produtorList().stream()
+                .filter(a -> a.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        Produtor.produtorList().remove(produtor);
+
+        return  ResponseEntity.ok(produtor);
 
     }
 
