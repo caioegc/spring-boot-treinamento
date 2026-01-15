@@ -12,7 +12,7 @@ import java.util.List;
 @Setter
 @Builder
 public class Heroe {
-  private long id;
+  private Long id;
   private String nome;
   private LocalDateTime atDate;
   public static List<Heroe> list = new ArrayList<>();

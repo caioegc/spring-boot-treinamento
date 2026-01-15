@@ -6,7 +6,9 @@ import caio.treinamento.inicio.producer.HeroePostRequest;
 import caio.treinamento.inicio.response.HeroeGetResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponseException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -49,6 +51,22 @@ public class HeroeController {
         Heroe.heroeList().add(heroe);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(heroe2);
+
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteById(@PathVariable Long id){
+
+        var heroe = Heroe.heroeList()
+                .stream()
+                .filter(c -> c.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+            Heroe.heroeList().remove(heroe);
+
+            return ResponseEntity.noContent().build();
+
 
     }
 
