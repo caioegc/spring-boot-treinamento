@@ -7,6 +7,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+import java.util.List;
+
 @Mapper
 public interface ProducerMapper {
     ProducerMapper INSTANCE = Mappers.getMapper(ProducerMapper.class);
@@ -16,6 +18,9 @@ public interface ProducerMapper {
     Produtor paraProdutor(ProducerPostRequest postRequest);
 
     ProducerGetResponse paraGetResponse(Produtor produtor);
+
+    List<ProducerGetResponse> listGetResponse(List<Produtor> produtors);
+
 
 
     }

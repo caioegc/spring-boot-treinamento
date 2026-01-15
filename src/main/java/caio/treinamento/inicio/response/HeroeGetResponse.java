@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class HeroeGetRequest {
+public class HeroeGetResponse {
     private long id;
     private String nome;
     private LocalDateTime atDate;

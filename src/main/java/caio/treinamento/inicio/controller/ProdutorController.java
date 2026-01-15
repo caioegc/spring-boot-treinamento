@@ -8,9 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 @RestController
 @RequestMapping("v1/produtor")
@@ -18,19 +16,32 @@ public class ProdutorController {
 
     public static ProducerMapper MAPPER = ProducerMapper.INSTANCE;
     @GetMapping
-    public List<Produtor> findByAll(@RequestParam(required = false) String nome) {
-        var produto = Produtor.produtorList();
+    public ResponseEntity<List<ProducerGetResponse>> findByAll(@RequestParam(required = false) String nome) {
+        var produtors = Produtor.produtorList();
 
         if (nome == null) {
-            return produto;
+            var list = MAPPER.listGetResponse(produtors);
+            return ResponseEntity.ok(list);
         } else {
-            return produto.stream().filter(c -> c.getNome().equalsIgnoreCase(nome)).toList();
+            var list2 = MAPPER.listGetResponse(produtors)
+                    .stream()
+                    .filter(c -> c.getNome().equalsIgnoreCase(nome))
+                    .toList();
+            return  ResponseEntity.ok(list2);
         }
     }
 
     @GetMapping("/{id}")
-    public Produtor findByID(@PathVariable("id") Long id) {
-        return Produtor.produtorList().stream().filter(c -> c.getId().equals(id)).findFirst().orElse(null);
+    public ResponseEntity<ProducerGetResponse> findByID(@PathVariable("id") Long id) {
+
+        var producerGetResponse = Produtor.produtorList()
+                .stream()
+                .filter(c -> c.getId().equals(id))
+                .map(MAPPER::paraGetResponse)
+                .findFirst()
+                .orElse(null);
+
+        return ResponseEntity.ok(producerGetResponse);
     }
 
     @PostMapping()
@@ -39,7 +50,7 @@ public class ProdutorController {
         var produtor2 = MAPPER.paraGetResponse(produtor);
 
         Produtor.produtorList().add(produtor);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(produtor2);
+        return ResponseEntity.status(HttpStatus.CREATED).body(produtor2);
 
     }
 

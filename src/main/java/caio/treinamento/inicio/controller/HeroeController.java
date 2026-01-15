@@ -1,53 +1,54 @@
 package caio.treinamento.inicio.controller;
 
 import caio.treinamento.inicio.entity.Heroe;
+import caio.treinamento.inicio.mapper.ProducerMapperHeroe;
 import caio.treinamento.inicio.producer.HeroePostRequest;
-import caio.treinamento.inicio.response.HeroeGetRequest;
+import caio.treinamento.inicio.response.HeroeGetResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("v1/heroe")
 public class HeroeController {
 
-
+    ProducerMapperHeroe MAPPER = ProducerMapperHeroe.INSTANCE;
 
     @GetMapping
-    public List<Heroe> findByAll(@RequestParam(required = false) String nome) {
+    public ResponseEntity<List<HeroeGetResponse>> findByAll(@RequestParam(required = false) String nome) {
+
+        var heroe = Heroe.heroeList();
+        var getAnime = MAPPER.list(heroe);
         if (nome == null) {
-            return Heroe.heroeList();
+            return ResponseEntity.ok(getAnime);
         }
-        return Heroe.heroeList().stream().filter(c -> c.getNome().equalsIgnoreCase(nome)).toList();
+       var list = getAnime.stream().filter(c -> c.getNome().equalsIgnoreCase(nome)).toList();
+        return ResponseEntity.ok(list);
     }
 
     @GetMapping("/{id}")
-    public Heroe findByName(@PathVariable("id") Long id){
-        return Heroe.heroeList().stream().filter(c -> c.getId() == id).findFirst().orElse(null);
+    public ResponseEntity<HeroeGetResponse> findByName(@PathVariable("id") Long id){
+        var heroeGetRequest = Heroe.heroeList()
+                .stream()
+                .filter(c -> c.getId() == id)
+                .map(MAPPER::toHeroeGet)
+                .findFirst()
+                .orElse(null);
+
+        return ResponseEntity.ok(heroeGetRequest);
     }
 
     @PostMapping
-    public ResponseEntity<HeroeGetRequest> save (@RequestBody HeroePostRequest heroePostRequest){
-        Heroe build = Heroe.builder()
-                .id(ThreadLocalRandom.current().nextLong(1000))
-                .nome(heroePostRequest.getNome())
-                .atDate(LocalDateTime.now())
-                .build();
+    public ResponseEntity<HeroeGetResponse> save (@RequestBody HeroePostRequest heroePostRequest){
 
-        HeroeGetRequest build1 = HeroeGetRequest
-                .builder()
-                .id(build.getId())
-                .nome(build.getNome())
-                .atDate(build.getAtDate())
-                .build();
+        var heroe = MAPPER.toHeroe(heroePostRequest);
+        var heroe2 = MAPPER.toHeroeGet(heroe);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(build1);
+        Heroe.heroeList().add(heroe);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(heroe2);
 
     }
 
