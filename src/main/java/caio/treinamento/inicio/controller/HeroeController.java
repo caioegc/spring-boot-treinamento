@@ -56,7 +56,7 @@ public class HeroeController {
     }
 
     @PutMapping
-    public ResponseEntity<Void> rename(@RequestBody HeroePutRequest heroePutRequest){
+    public ResponseEntity<Void> update(@RequestBody HeroePutRequest heroePutRequest){
 
         var heroeRemove = Heroe.heroeList()
                 .stream()
@@ -73,7 +73,7 @@ public class HeroeController {
 
     }
 
-    @DeleteMapping
+    @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id){
 
         var heroe = Heroe.heroeList()
