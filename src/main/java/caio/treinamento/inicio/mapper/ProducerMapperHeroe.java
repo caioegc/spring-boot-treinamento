@@ -2,6 +2,7 @@ package caio.treinamento.inicio.mapper;
 
 import caio.treinamento.inicio.entity.Heroe;
 import caio.treinamento.inicio.producer.HeroePostRequest;
+import caio.treinamento.inicio.producer.HeroePutRequest;
 import caio.treinamento.inicio.response.HeroeGetResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -22,4 +23,5 @@ public interface ProducerMapperHeroe {
 
     List<HeroeGetResponse> list(List<Heroe> heroe);
 
+    Heroe toHeroe(HeroePutRequest heroePutRequest);
 }

@@ -2,6 +2,7 @@ package caio.treinamento.inicio.controller;
 
 import caio.treinamento.inicio.entity.Produtor;
 import caio.treinamento.inicio.mapper.ProducerMapper;
+import caio.treinamento.inicio.producer.HeroePutRequest;
 import caio.treinamento.inicio.producer.ProducerPostRequest;
 import caio.treinamento.inicio.response.ProducerGetResponse;
 import org.springframework.http.HttpStatus;
@@ -55,8 +56,9 @@ public class ProdutorController {
 
     }
 
+
     @DeleteMapping("{id}")
-    public ResponseEntity<Produtor> produtor(@PathVariable Long id){
+    public ResponseEntity<Void> deleteById(@PathVariable Long id){
 
         var produtor = Produtor.produtorList().stream()
                 .filter(a -> a.getId().equals(id))
@@ -65,7 +67,7 @@ public class ProdutorController {
 
         Produtor.produtorList().remove(produtor);
 
-        return  ResponseEntity.ok(produtor);
+        return ResponseEntity.noContent().build();
 
     }
 

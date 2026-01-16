@@ -3,6 +3,7 @@ package caio.treinamento.inicio.controller;
 import caio.treinamento.inicio.entity.Heroe;
 import caio.treinamento.inicio.mapper.ProducerMapperHeroe;
 import caio.treinamento.inicio.producer.HeroePostRequest;
+import caio.treinamento.inicio.producer.HeroePutRequest;
 import caio.treinamento.inicio.response.HeroeGetResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,6 +52,24 @@ public class HeroeController {
         Heroe.heroeList().add(heroe);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(heroe2);
+
+    }
+
+    @PutMapping
+    public ResponseEntity<Void> rename(@RequestBody HeroePutRequest heroePutRequest){
+
+        var heroeRemove = Heroe.heroeList()
+                .stream()
+                .filter(c -> c.getId().equals(heroePutRequest.getId()))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        var heroePut = MAPPER.toHeroe(heroePutRequest);
+        Heroe.heroeList().remove(heroeRemove);
+        Heroe.heroeList().add(heroePut);
+
+        return ResponseEntity.noContent().build();
+
 
     }
 
