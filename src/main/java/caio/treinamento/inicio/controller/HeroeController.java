@@ -1,55 +1,55 @@
 package caio.treinamento.inicio.controller;
 
-import caio.treinamento.inicio.entity.Heroe;
-import caio.treinamento.inicio.mapper.ProducerMapperHeroe;
+import caio.treinamento.inicio.mapper.HeroeMapper;
 import caio.treinamento.inicio.producer.HeroePostRequest;
 import caio.treinamento.inicio.producer.HeroePutRequest;
 import caio.treinamento.inicio.response.HeroeGetResponse;
+import caio.treinamento.inicio.service.HeroeService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponseException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("v1/heroe")
+@RequiredArgsConstructor
 public class HeroeController {
 
-    ProducerMapperHeroe MAPPER = ProducerMapperHeroe.INSTANCE;
+    private final HeroeMapper MAPPER;
+    private final HeroeService heroeService;
 
     @GetMapping
     public ResponseEntity<List<HeroeGetResponse>> findByAll(@RequestParam(required = false) String nome) {
 
-        var heroe = Heroe.heroeList();
+        var heroe = heroeService.listAll(nome);
+
         var getAnime = MAPPER.list(heroe);
-        if (nome == null) {
-            return ResponseEntity.ok(getAnime);
-        }
-       var list = getAnime.stream().filter(c -> c.getNome().equalsIgnoreCase(nome)).toList();
-        return ResponseEntity.ok(list);
+
+        return ResponseEntity.ok(getAnime);
+
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<HeroeGetResponse> findByName(@PathVariable("id") Long id){
-        var heroeGetRequest = Heroe.heroeList()
-                .stream()
-                .filter(c -> c.getId() == id)
-                .map(MAPPER::toHeroeGet)
-                .findFirst()
-                .orElse(null);
+    public ResponseEntity<HeroeGetResponse> findById(@PathVariable Long id){
 
-        return ResponseEntity.ok(heroeGetRequest);
+        var heroe = heroeService.listById(id);
+
+        var heroeGet = MAPPER.toHeroeGet(heroe);
+
+        return ResponseEntity.ok(heroeGet);
     }
 
     @PostMapping
     public ResponseEntity<HeroeGetResponse> save (@RequestBody HeroePostRequest heroePostRequest){
 
-        var heroe = MAPPER.toHeroe(heroePostRequest);
-        var heroe2 = MAPPER.toHeroeGet(heroe);
 
-        Heroe.heroeList().add(heroe);
+        var heroe = MAPPER.toHeroe(heroePostRequest);
+
+        var heroe1 = heroeService.create(heroe);
+
+        var heroe2 = MAPPER.toHeroeGet(heroe1);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(heroe2);
 
@@ -58,15 +58,10 @@ public class HeroeController {
     @PutMapping
     public ResponseEntity<Void> update(@RequestBody HeroePutRequest heroePutRequest){
 
-        var heroeRemove = Heroe.heroeList()
-                .stream()
-                .filter(c -> c.getId().equals(heroePutRequest.getId()))
-                .findFirst()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        var heroePut = MAPPER.toHeroe(heroePutRequest);
-        Heroe.heroeList().remove(heroeRemove);
-        Heroe.heroeList().add(heroePut);
+        var toHeroePut = MAPPER.toHeroe(heroePutRequest);
+        heroeService.update(toHeroePut);
+
 
         return ResponseEntity.noContent().build();
 
@@ -76,13 +71,7 @@ public class HeroeController {
     @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id){
 
-        var heroe = Heroe.heroeList()
-                .stream()
-                .filter(c -> c.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-            Heroe.heroeList().remove(heroe);
+            heroeService.delete(id);
 
             return ResponseEntity.noContent().build();
 

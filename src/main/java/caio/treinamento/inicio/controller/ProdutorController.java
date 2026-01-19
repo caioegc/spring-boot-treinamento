@@ -4,7 +4,11 @@ import caio.treinamento.inicio.entity.Produtor;
 import caio.treinamento.inicio.mapper.ProducerMapper;
 import caio.treinamento.inicio.producer.HeroePutRequest;
 import caio.treinamento.inicio.producer.ProducerPostRequest;
+import caio.treinamento.inicio.producer.ProducerPutRequest;
 import caio.treinamento.inicio.response.ProducerGetResponse;
+import caio.treinamento.inicio.service.ProdutorService;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,58 +18,55 @@ import java.util.List;
 
 @RestController
 @RequestMapping("v1/produtor")
+@RequiredArgsConstructor
 public class ProdutorController {
 
-    public static ProducerMapper MAPPER = ProducerMapper.INSTANCE;
+    private final ProducerMapper MAPPER;
+    private final ProdutorService service;
+
     @GetMapping
     public ResponseEntity<List<ProducerGetResponse>> findByAll(@RequestParam(required = false) String nome) {
-        var produtors = Produtor.produtorList();
 
-        if (nome == null) {
-            var list = MAPPER.listGetResponse(produtors);
-            return ResponseEntity.ok(list);
-        } else {
-            var list2 = MAPPER.listGetResponse(produtors)
-                    .stream()
-                    .filter(c -> c.getNome().equalsIgnoreCase(nome))
-                    .toList();
-            return  ResponseEntity.ok(list2);
-        }
+        var produtors = service.produtorList(nome);
+        var list = MAPPER.listGetResponse(produtors);
+        return ResponseEntity.ok(list);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<ProducerGetResponse> findByID(@PathVariable("id") Long id) {
 
-        var producerGetResponse = Produtor.produtorList()
-                .stream()
-                .filter(c -> c.getId().equals(id))
-                .map(MAPPER::paraGetResponse)
-                .findFirst()
-                .orElse(null);
-
+        var produtor = service.listById(id);
+        var producerGetResponse = MAPPER.paraGetResponse(produtor);
         return ResponseEntity.ok(producerGetResponse);
     }
 
     @PostMapping()
     public ResponseEntity<ProducerGetResponse> save(@RequestBody ProducerPostRequest producerPostRequest) {
         var produtor = MAPPER.paraProdutor(producerPostRequest);
-        var produtor2 = MAPPER.paraGetResponse(produtor);
+        var produtor1 = service.create(produtor);
+        var produtor2 = MAPPER.paraGetResponse(produtor1);
 
-        Produtor.produtorList().add(produtor);
         return ResponseEntity.status(HttpStatus.CREATED).body(produtor2);
+
+    }
+
+    @PutMapping
+    public ResponseEntity<Void> updateById(@RequestBody ProducerPutRequest produtor) {
+
+        var produtor1 = MAPPER.paraProdutor(produtor);
+
+        service.update(produtor1);
+
+        return ResponseEntity.noContent().build();
 
     }
 
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable Long id){
+    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
 
-        var produtor = Produtor.produtorList().stream()
-                .filter(a -> a.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-        Produtor.produtorList().remove(produtor);
+        service.delete(id);
 
         return ResponseEntity.noContent().build();
 
