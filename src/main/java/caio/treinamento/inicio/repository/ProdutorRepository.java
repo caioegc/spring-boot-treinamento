@@ -16,43 +16,38 @@ import java.util.Optional;
 @Log4j2
 public class ProdutorRepository {
 
-    public static final List<Produtor> PRODUTORS = new ArrayList<>();
+    final DataRepository dataRepository;
     private final Conections connections;
 
-    static {
-        var mappa = Produtor.builder().id(1L).nome("Mappa").createdAt(LocalDateTime.now()).build();
-        var kyotoAnimattion = Produtor.builder().id(2L).nome("Kyoto Animattion").createdAt(LocalDateTime.now()).build();
-        var mandhouse = Produtor.builder().id(3L).nome("Mandhouse").createdAt(LocalDateTime.now()).build();
-        PRODUTORS.addAll(List.of(mappa, kyotoAnimattion, mandhouse));
-    }
+
 
     public List<Produtor> produtorList() {
-        return PRODUTORS;
+        return dataRepository.getProdutors();
 
     }
 
     public List<Produtor> listByNome(String nome){
         log.debug(connections);
 
-       return PRODUTORS.stream()
+       return dataRepository.getProdutors().stream()
                 .filter(a -> a.getNome().equalsIgnoreCase(nome))
                 .toList();
 
     }
 
     public Optional<Produtor> byId(Long id){
-        return PRODUTORS.stream().filter(a -> a.getId().equals(id)).findFirst();
+        return dataRepository.getProdutors().stream().filter(a -> a.getId().equals(id)).findFirst();
 
 
     }
 
     public Produtor create(Produtor produtor){
-        PRODUTORS.add(produtor);
+        dataRepository.getProdutors().add(produtor);
         return produtor;
     }
 
     public void delete(Produtor produtor){
-        PRODUTORS.remove(produtor);
+        dataRepository.getProdutors().remove(produtor);
     }
 
     public void update(Produtor produtor){
