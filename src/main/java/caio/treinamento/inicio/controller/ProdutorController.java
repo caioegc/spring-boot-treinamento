@@ -1,18 +1,14 @@
 package caio.treinamento.inicio.controller;
 
-import caio.treinamento.inicio.entity.Produtor;
 import caio.treinamento.inicio.mapper.ProducerMapper;
-import caio.treinamento.inicio.producer.HeroePutRequest;
 import caio.treinamento.inicio.producer.ProducerPostRequest;
 import caio.treinamento.inicio.producer.ProducerPutRequest;
 import caio.treinamento.inicio.response.ProducerGetResponse;
 import caio.treinamento.inicio.service.ProdutorService;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -21,14 +17,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProdutorController {
 
-    private final ProducerMapper MAPPER;
+    private final ProducerMapper mapper;
     private final ProdutorService service;
 
     @GetMapping
     public ResponseEntity<List<ProducerGetResponse>> findByAll(@RequestParam(required = false) String nome) {
 
         var produtors = service.produtorList(nome);
-        var list = MAPPER.listGetResponse(produtors);
+        var list = mapper.listGetResponse(produtors);
         return ResponseEntity.ok(list);
     }
 
@@ -37,15 +33,15 @@ public class ProdutorController {
     public ResponseEntity<ProducerGetResponse> findByID(@PathVariable("id") Long id) {
 
         var produtor = service.listById(id);
-        var producerGetResponse = MAPPER.paraGetResponse(produtor);
+        var producerGetResponse = mapper.paraGetResponse(produtor);
         return ResponseEntity.ok(producerGetResponse);
     }
 
     @PostMapping()
     public ResponseEntity<ProducerGetResponse> save(@RequestBody ProducerPostRequest producerPostRequest) {
-        var produtor = MAPPER.paraProdutor(producerPostRequest);
+        var produtor = mapper.paraProdutor(producerPostRequest);
         var produtor1 = service.create(produtor);
-        var produtor2 = MAPPER.paraGetResponse(produtor1);
+        var produtor2 = mapper.paraGetResponse(produtor1);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(produtor2);
 
@@ -54,7 +50,7 @@ public class ProdutorController {
     @PutMapping
     public ResponseEntity<Void> updateById(@RequestBody ProducerPutRequest produtor) {
 
-        var produtor1 = MAPPER.paraProdutor(produtor);
+        var produtor1 = mapper.paraProdutor(produtor);
 
         service.update(produtor1);
 

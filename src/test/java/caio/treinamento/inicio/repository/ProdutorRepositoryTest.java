@@ -41,7 +41,7 @@ class ProdutorRepositoryTest {
     @Test
     @Order(1)
     @DisplayName("Return list with names the productor")
-    void findAll_ReturnAllProducers_WhenSuccecs(){
+    void findAll_ReturnAllProducers_WhenSuccecs() {
         BDDMockito.when(dataRepository.getProdutors()).thenReturn(produtorList);
 
         var produtors = produtorRepository.produtorList();
@@ -51,7 +51,7 @@ class ProdutorRepositoryTest {
 
     @Test
     @Order(2)
-    void findById(){
+    void findById() {
         BDDMockito.when(dataRepository.getProdutors()).thenReturn(produtorList);
         var expectedProductor = produtorList.get(0);
         var produtors = produtorRepository.byId(expectedProductor.getId());
@@ -62,7 +62,7 @@ class ProdutorRepositoryTest {
 
     @Test
     @Order(3)
-    void findByName(){
+    void findByName() {
         BDDMockito.when(dataRepository.getProdutors()).thenReturn(produtorList);
         var produtors = produtorRepository.listByNome(null);
 
@@ -72,13 +72,58 @@ class ProdutorRepositoryTest {
 
     @Test
     @Order(4)
-    void findByNameDifferentNull(){
+    void findByNameDifferentNull() {
         BDDMockito.when(dataRepository.getProdutors()).thenReturn(produtorList);
         var expectedProductor = produtorList.get(0);
 
         var produtors = produtorRepository.listByNome(expectedProductor.getNome());
 
         Assertions.assertThat(produtors).contains(expectedProductor);
+    }
+
+    @Test
+    @DisplayName("Esse método testa se o create funciona")
+    void createReturnValido() {
+        BDDMockito.when(dataRepository.getProdutors()).thenReturn(produtorList);
+        var expectedProductor = Produtor
+                .builder()
+                .id(1L)
+                .nome("Luis")
+                .createdAt(LocalDateTime.now())
+                .build();
+        var produtor = produtorRepository.create(expectedProductor);
+        Assertions.assertThat(produtor).isEqualTo(expectedProductor).hasNoNullFieldsOrProperties();
+
+        var produtor1 = produtorRepository.byId(produtor.getId());
+        Assertions.assertThat(produtor1).isPresent().contains(expectedProductor);
+
+
+    }
+
+    @Test
+    void deleteReturnValido() {
+        BDDMockito.when(dataRepository.getProdutors()).thenReturn(produtorList);
+        var produtorListDelete = produtorList.get(0);
+
+        produtorRepository.delete(produtorListDelete);
+
+        var producers = produtorRepository.produtorList();
+
+        Assertions.assertThat(producers).isNotEmpty().doesNotContain(produtorListDelete);
+
+    }
+
+    @Test
+    void update() {
+        BDDMockito.when(dataRepository.getProdutors()).thenReturn(produtorList);
+        var updateExpected = produtorList.get(0);
+        updateExpected.setNome("Caia");
+        produtorRepository.update(updateExpected);
+
+        Assertions.assertThat(produtorList).contains(updateExpected);
+        var produtor = produtorRepository.byId(updateExpected.getId());
+
+        Assertions.assertThat(produtor.get().getNome()).isEqualTo(updateExpected.getNome());
     }
 
 

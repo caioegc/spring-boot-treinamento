@@ -17,7 +17,7 @@ import java.util.Optional;
 public class ProdutorRepository {
 
     final DataRepository dataRepository;
-    private final Conections connections;
+//    private final Conections connections;
 
 
 
@@ -27,7 +27,7 @@ public class ProdutorRepository {
     }
 
     public List<Produtor> listByNome(String nome){
-        log.debug(connections);
+//        log.debug(connections);
 
        return dataRepository.getProdutors().stream()
                 .filter(a -> a.getNome().equalsIgnoreCase(nome))
