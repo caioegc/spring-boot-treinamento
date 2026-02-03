@@ -14,8 +14,8 @@ public class ConfigurationController {
 
     private final Conections conections;
 
-   @GetMapping
-   public ResponseEntity<Conections> getConections(){
-   return ResponseEntity.ok(conections);
-   }
+    @GetMapping
+    public ResponseEntity<Conections> getConections() {
+        return ResponseEntity.ok(conections);
+    }
 }

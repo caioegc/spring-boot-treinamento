@@ -16,13 +16,13 @@ import java.util.List;
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class ProducerGetResponse {
-   @EqualsAndHashCode.Include
-   private Long id;
+    @EqualsAndHashCode.Include
+    private Long id;
 
-   private String nome;
+    private String nome;
 
-   private LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
-   public static List<Produtor> list = new ArrayList<>();
+    public static List<Produtor> list = new ArrayList<>();
 
 }

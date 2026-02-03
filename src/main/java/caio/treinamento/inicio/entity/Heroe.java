@@ -15,11 +15,11 @@ import java.util.List;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Heroe {
 
-  @EqualsAndHashCode.Include
-  private Long id;
+    @EqualsAndHashCode.Include
+    private Long id;
 
-  private String nome;
-  private LocalDateTime atDate;
-  public static List<Heroe> list = new ArrayList<>();
+    private String nome;
+    private LocalDateTime atDate;
+    public static List<Heroe> list = new ArrayList<>();
 
 }

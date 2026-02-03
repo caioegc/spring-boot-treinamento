@@ -19,6 +19,7 @@ public class DataRepository {
         var mandhouse = Produtor.builder().id(3L).nome("Mandhouse").createdAt(LocalDateTime.now()).build();
         produtors.addAll(List.of(mappa, kyotoAnimattion, mandhouse));
     }
+
     {
         var naruto = Heroe.builder().id(1L).nome("Naruto").atDate(LocalDateTime.now()).build();
         var dragonball = Heroe.builder().id(2L).nome("Goku").atDate(LocalDateTime.now()).build();

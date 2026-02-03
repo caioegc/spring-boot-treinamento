@@ -2,21 +2,16 @@ package caio.treinamento.inicio.controller;
 
 
 import caio.treinamento.inicio.entity.Anime;
-import caio.treinamento.inicio.entity.Heroe;
 import caio.treinamento.inicio.mapper.AnimeMapper;
 import caio.treinamento.inicio.producer.AnimePostRequest;
 import caio.treinamento.inicio.producer.AnimePuttRequest;
 import caio.treinamento.inicio.response.AnimeGetResponse;
-import caio.treinamento.inicio.response.HeroeGetResponse;
-import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 
 @RestController
@@ -26,11 +21,11 @@ public class AnimeController {
     AnimeMapper MAPPER = AnimeMapper.INSTANCE;
 
     @GetMapping
-    public ResponseEntity<List<Anime>> listAll(@RequestParam String nome){
+    public ResponseEntity<List<Anime>> listAll(@RequestParam String nome) {
         var list = Anime.getList();
         var list1 = MAPPER.list(list);
 
-        if(nome == null){
+        if (nome == null) {
             return ResponseEntity.ok(list1);
         }
 
@@ -39,7 +34,7 @@ public class AnimeController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<AnimeGetResponse> listAll(@PathVariable Long id){
+    public ResponseEntity<AnimeGetResponse> listAll(@PathVariable Long id) {
         var anime1 = Anime.getList().stream()
                 .filter(a -> a.getId().equals(id))
                 .map(MAPPER::animeGetResponse)
@@ -50,7 +45,7 @@ public class AnimeController {
     }
 
     @PostMapping
-    public ResponseEntity<AnimeGetResponse> create(@RequestBody AnimePostRequest anime ){
+    public ResponseEntity<AnimeGetResponse> create(@RequestBody AnimePostRequest anime) {
         var anime1 = MAPPER.animePostRequest(anime);
         var anime2 = MAPPER.animeGetResponse(anime1);
 
@@ -59,7 +54,7 @@ public class AnimeController {
     }
 
     @PutMapping
-    public ResponseEntity<Void> update(@RequestBody AnimePuttRequest animePuttRequest){
+    public ResponseEntity<Void> update(@RequestBody AnimePuttRequest animePuttRequest) {
         var animeDelete = Anime.getList().stream()
                 .filter(a -> a.getId().equals(animePuttRequest.getId()))
                 .findFirst()
@@ -75,7 +70,7 @@ public class AnimeController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id){
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         var animeDelete = Anime.getList().stream()
                 .filter(a -> a.getId().equals(id))
                 .findFirst()
@@ -85,6 +80,6 @@ public class AnimeController {
         return ResponseEntity.noContent().build();
 
 
-}
+    }
 
 }

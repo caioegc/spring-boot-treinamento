@@ -14,25 +14,25 @@ import java.util.List;
 public class ProdutorService {
     private final ProdutorRepository repository;
 
-    public List<Produtor> produtorList(String nome){
+    public List<Produtor> produtorList(String nome) {
 
-        return nome==null ? repository.produtorList() : repository.listByNome(nome);
+        return nome == null ? repository.produtorList() : repository.listByNome(nome);
     }
 
-    public Produtor listById(Long id){
+    public Produtor listById(Long id) {
         return repository.byId(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    public Produtor create(Produtor produtor){
+    public Produtor create(Produtor produtor) {
         return repository.create(produtor);
     }
 
-    public void delete(Long id){
+    public void delete(Long id) {
         var produtor1 = listById(id);
         repository.delete(produtor1);
     }
 
-    public void update(Produtor produtor){
+    public void update(Produtor produtor) {
         var produtor1 = listById(produtor.getId());
         produtor.setCreatedAt(produtor1.getCreatedAt());
         repository.update(produtor);

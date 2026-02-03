@@ -1,10 +1,11 @@
 package caio.treinamento.inicio.entity;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Getter
@@ -12,10 +13,10 @@ import java.util.List;
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Produtor {
-  @EqualsAndHashCode.Include
-  private Long id;
-  private String nome;
-  private LocalDateTime createdAt;
+    @EqualsAndHashCode.Include
+    private Long id;
+    private String nome;
+    private LocalDateTime createdAt;
 
 
 }

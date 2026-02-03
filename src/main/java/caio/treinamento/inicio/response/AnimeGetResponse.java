@@ -5,7 +5,7 @@ import lombok.Setter;
 
 public class AnimeGetResponse {
 
-   @Getter
-   @Setter
-   private String nome;
+    @Getter
+    @Setter
+    private String nome;
 }

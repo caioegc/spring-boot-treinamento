@@ -32,7 +32,7 @@ public class HeroeController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<HeroeGetResponse> findById(@PathVariable Long id){
+    public ResponseEntity<HeroeGetResponse> findById(@PathVariable Long id) {
 
         var heroe = heroeService.listById(id);
 
@@ -42,7 +42,7 @@ public class HeroeController {
     }
 
     @PostMapping
-    public ResponseEntity<HeroeGetResponse> save (@RequestBody HeroePostRequest heroePostRequest){
+    public ResponseEntity<HeroeGetResponse> save(@RequestBody HeroePostRequest heroePostRequest) {
 
 
         var heroe = MAPPER.toHeroe(heroePostRequest);
@@ -56,7 +56,7 @@ public class HeroeController {
     }
 
     @PutMapping
-    public ResponseEntity<Void> update(@RequestBody HeroePutRequest heroePutRequest){
+    public ResponseEntity<Void> update(@RequestBody HeroePutRequest heroePutRequest) {
 
 
         var toHeroePut = MAPPER.toHeroe(heroePutRequest);
@@ -69,11 +69,11 @@ public class HeroeController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable Long id){
+    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
 
-            heroeService.delete(id);
+        heroeService.delete(id);
 
-            return ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build();
 
 
     }
