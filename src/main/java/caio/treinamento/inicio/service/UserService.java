@@ -22,8 +22,9 @@ public class UserService {
        return userRepository.listId(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    public void create(User user){
+    public User create(User user){
         userRepository.createUser(user);
+        return user;
     }
     public void detete(Long id){
         var user1 = listById(id);
@@ -32,6 +33,6 @@ public class UserService {
 
     public void update(User user){
         var user1 = listById(user.getId());
-        userRepository.updateUser(user1);
+        userRepository.updateUser(user);
     }
 }

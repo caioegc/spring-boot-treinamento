@@ -31,8 +31,9 @@ public class UserRepository {
 
     }
 
-    public void createUser(User user){
+    public User createUser(User user){
         dataUserRepository.getUser().add(user);
+        return user;
 
     }
 
@@ -41,7 +42,8 @@ public class UserRepository {
     }
 
     public void updateUser(User user){
-        createUser(user);
         deleteUser(user);
+        createUser(user);
+
     }
 }
