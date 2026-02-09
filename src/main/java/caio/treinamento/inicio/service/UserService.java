@@ -14,6 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+
     public List<User> listUser(String nome){
         return nome == null ? userRepository.listAll() : userRepository.listByName(nome);
     }

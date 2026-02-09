@@ -30,8 +30,11 @@ import java.util.List;
 
 @WebMvcTest(controllers = ProdutorController.class)
 //@Import({ProducerMapperImpl.class, ProdutorService.class, ProdutorRepository.class, DataRepository.class})
-@ComponentScan(basePackages = "caio.treinamento")
+@ComponentScan(basePackages = "caio.treinamento.inicio") // substitui o import abaixo pois é menor, o import se tivesse muita classe ia precisar exportar uma por uma
 class ProdutorControllerTest {
+
+   @MockBean
+   public external.dependency.Conections connections;
 
    @Autowired
    private MockMvc mockMvc;
@@ -48,12 +51,11 @@ class ProdutorControllerTest {
          var dateTime = "2024-08-02T10:36:59.441554";
          var dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
          var parse = LocalDateTime.parse(dateTime, dateTimeFormatter);
-         var komecco = Produtor.builder().id(1L).nome("komecco").createdAt(parse).build();
+         var komecco = Produtor.builder().id(1L).nome("ufotable").createdAt(parse).build();
          var argo = Produtor.builder().id(2L).nome("argo").createdAt(parse).build();
          var rexona = Produtor.builder().id(3L).nome("Mandhouse").createdAt(parse).build();
-         var ufatable = Produtor.builder().id(4L).nome("Ufotable").createdAt(parse).build();
 
-         produtorList.addAll(List.of(komecco, argo, rexona, ufatable));
+         produtorList.addAll(List.of(komecco, argo, rexona));
       }
    }
 
@@ -74,9 +76,9 @@ class ProdutorControllerTest {
    void findAll_ReturnsFoundProducerInList_WhenNameIsFound() throws Exception {
       BDDMockito.when(dataRepository.getProdutors()).thenReturn(produtorList);
       var response = readResourceFile("produtor/get-produtor-ufotable-name-200.json");
-      var name = "Ufotable";
+      var name = "ufotable";
 
-      mockMvc.perform(MockMvcRequestBuilders.get("/v1/producers").param("nome", name))
+      mockMvc.perform(MockMvcRequestBuilders.get("/v1/produtor").param("nome", name))
               .andDo(MockMvcResultHandlers.print())
               .andExpect(MockMvcResultMatchers.status().isOk())
               .andExpect(MockMvcResultMatchers.content().json(response));
