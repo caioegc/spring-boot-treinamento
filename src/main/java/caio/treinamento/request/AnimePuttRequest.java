@@ -1,4 +1,4 @@
-package caio.treinamento.inicio.producer;
+package caio.treinamento.request;
 
 import lombok.Getter;
 import lombok.Setter;

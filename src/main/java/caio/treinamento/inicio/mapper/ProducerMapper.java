@@ -1,9 +1,10 @@
 package caio.treinamento.inicio.mapper;
 
 import caio.treinamento.inicio.entity.Produtor;
-import caio.treinamento.inicio.producer.ProducerPostRequest;
-import caio.treinamento.inicio.producer.ProducerPutRequest;
+
 import caio.treinamento.inicio.response.ProducerGetResponse;
+import caio.treinamento.request.ProducerPostRequest;
+import caio.treinamento.request.ProducerPutRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;

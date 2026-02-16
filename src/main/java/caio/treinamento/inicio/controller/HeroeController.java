@@ -1,10 +1,13 @@
 package caio.treinamento.inicio.controller;
 
+import caio.treinamento.inicio.exceptions.DefaultErrorMensagem;
+import caio.treinamento.inicio.exceptions.NotFoundException;
 import caio.treinamento.inicio.mapper.HeroeMapper;
-import caio.treinamento.inicio.producer.HeroePostRequest;
-import caio.treinamento.inicio.producer.HeroePutRequest;
 import caio.treinamento.inicio.response.HeroeGetResponse;
 import caio.treinamento.inicio.service.HeroeService;
+import caio.treinamento.request.HeroePostRequest;
+import caio.treinamento.request.HeroePutRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +45,7 @@ public class HeroeController {
     }
 
     @PostMapping
-    public ResponseEntity<HeroeGetResponse> save(@RequestBody HeroePostRequest heroePostRequest) {
+    public ResponseEntity<HeroeGetResponse> save(@RequestBody @Valid HeroePostRequest heroePostRequest) {
 
 
         var heroe = MAPPER.toHeroe(heroePostRequest);
@@ -56,7 +59,7 @@ public class HeroeController {
     }
 
     @PutMapping
-    public ResponseEntity<Void> update(@RequestBody HeroePutRequest heroePutRequest) {
+    public ResponseEntity<Void> update(@RequestBody @Valid HeroePutRequest heroePutRequest) {
 
 
         var toHeroePut = MAPPER.toHeroe(heroePutRequest);
@@ -77,6 +80,5 @@ public class HeroeController {
 
 
     }
-
 
 }

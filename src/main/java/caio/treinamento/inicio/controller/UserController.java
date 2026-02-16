@@ -1,11 +1,11 @@
 package caio.treinamento.inicio.controller;
 
-import caio.treinamento.inicio.entity.User;
 import caio.treinamento.inicio.mapper.UserMapper;
 import caio.treinamento.inicio.response.UserResponse;
 import caio.treinamento.inicio.service.UserService;
 import caio.treinamento.request.UserRequest;
 import caio.treinamento.request.UserRequestPut;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +22,7 @@ public class UserController {
     private final UserMapper userMapper;
 
     @GetMapping
-    public ResponseEntity<List<UserResponse>> listUser(@RequestBody(required = false) String nome){
+    public ResponseEntity<List<UserResponse>> listUser(@RequestParam(required = false) String nome){
         var users = userService.listUser(nome);
         var user = userMapper.toUserGet(users);
         return ResponseEntity.ok(user);
@@ -39,7 +39,7 @@ public class UserController {
 
 
     @PostMapping
-    public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest userRequest){
+    public ResponseEntity<UserResponse> createUser(@RequestBody @Valid UserRequest userRequest){
 
 
         var user1 = userMapper.toUser(userRequest);
@@ -50,7 +50,7 @@ public class UserController {
     }
 
     @PutMapping()
-    public ResponseEntity<Void> updateUser(@RequestBody UserRequestPut userRequest){
+    public ResponseEntity<Void> updateUser(@RequestBody @Valid UserRequestPut userRequest){
         var user = userMapper.toUserPut(userRequest);
         userService.update(user);
         return ResponseEntity.noContent().build();

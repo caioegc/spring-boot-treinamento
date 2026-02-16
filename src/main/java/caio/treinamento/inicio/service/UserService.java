@@ -1,6 +1,7 @@
 package caio.treinamento.inicio.service;
 
 import caio.treinamento.inicio.entity.User;
+import caio.treinamento.inicio.exceptions.NotFoundException;
 import caio.treinamento.inicio.repository.DataUserRepository;
 import caio.treinamento.inicio.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ public class UserService {
     }
 
     public User listById(Long id){
-       return userRepository.listId(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+       return userRepository.listId(id).orElseThrow(() -> new NotFoundException("Necessário ID"));
     }
 
     public User create(User user){

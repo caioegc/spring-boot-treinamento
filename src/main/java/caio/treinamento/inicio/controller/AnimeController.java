@@ -3,9 +3,10 @@ package caio.treinamento.inicio.controller;
 
 import caio.treinamento.inicio.entity.Anime;
 import caio.treinamento.inicio.mapper.AnimeMapper;
-import caio.treinamento.inicio.producer.AnimePostRequest;
-import caio.treinamento.inicio.producer.AnimePuttRequest;
+
 import caio.treinamento.inicio.response.AnimeGetResponse;
+import caio.treinamento.request.AnimePostRequest;
+import caio.treinamento.request.AnimePuttRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

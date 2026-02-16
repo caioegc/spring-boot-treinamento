@@ -1,11 +1,16 @@
 package caio.treinamento.inicio.controller;
 
+import caio.treinamento.inicio.commons.FileUtils;
 import caio.treinamento.inicio.entity.Heroe;
 import caio.treinamento.inicio.repository.DataRepository;
 import caio.treinamento.inicio.repository.HeroeRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +21,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -26,6 +32,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 
 @WebMvcTest(controllers = HeroeController.class)
@@ -45,7 +52,7 @@ class HeroeControllerTest {
     public external.dependency.Conections connections;
 
     @Autowired
-    private ResourceLoader resourceLoader;
+    private FileUtils fileUtils;
 
     @SpyBean
     private HeroeRepository heroeRepository;
@@ -69,7 +76,7 @@ class HeroeControllerTest {
         BDDMockito.when(dataRepository.getHEROES()).thenReturn(heroe);
 
 
-        var response = readResource("heroe/get-heroe-null-name-200.json");
+        var response = fileUtils.fileLoader("heroe/get-heroe-null-name-200.json");
         mockMvc.perform(MockMvcRequestBuilders.get("/v1/heroe"))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -82,7 +89,7 @@ class HeroeControllerTest {
     void buscarTodos_RetornaTodosHeroes_QuandoArgumentoForNul() throws Exception {
         BDDMockito.when(dataRepository.getHEROES()).thenReturn(heroe);
 
-        var response = readResource("heroe/get-heroe-sasuke-name-200.json");
+        var response = fileUtils.fileLoader("heroe/get-heroe-sasuke-name-200.json");
         var nome = "Sasuke";
         mockMvc.perform(MockMvcRequestBuilders.get("/v1/heroe").param("nome", nome))
                 .andDo(MockMvcResultHandlers.print())
@@ -96,7 +103,7 @@ class HeroeControllerTest {
     void buscarTodos_RetornaTodosHeroes_QuandoArgumentoNaoForEncontrado() throws Exception {
         BDDMockito.when(dataRepository.getHEROES()).thenReturn(heroe);
 
-        var response = readResource("heroe/get-heroe-x-name-200.json");
+        var response = fileUtils.fileLoader("heroe/get-heroe-x-name-200.json");
         var nome = "x";
         mockMvc.perform(MockMvcRequestBuilders.get("/v1/heroe").param("nome", nome))
                 .andDo(MockMvcResultHandlers.print())
@@ -110,7 +117,7 @@ class HeroeControllerTest {
     void buscarPorId_RetornarObjeto_QuandoArgumentoForEncontrado() throws Exception {
         BDDMockito.when(dataRepository.getHEROES()).thenReturn(heroe);
 
-        var response = readResource("heroe/get-heroe-id-200.json");
+        var response = fileUtils.fileLoader("heroe/get-heroe-id-200.json");
         var id = 1L;
         mockMvc.perform(MockMvcRequestBuilders.get("/v1/heroe/{id}", id))
                 .andDo(MockMvcResultHandlers.print())
@@ -133,8 +140,8 @@ class HeroeControllerTest {
     @Test
     @DisplayName("@DisplayName(POST v1/Heroe salva quando for um sucesso")
     void salvamentoFeitoQuandoForUmSucesso() throws Exception {
-        var request = readResource("heroe/post-request-heroe-200.json");
-        var response = readResource("heroe/post-response-heroe-201.json");
+        var request = fileUtils.fileLoader("heroe/post-request-heroe-200.json");
+        var response = fileUtils.fileLoader("heroe/post-response-heroe-201.json");
 
         var novoHeroeCriado = Heroe.builder().id(99L).nome("Nagato").atDate(LocalDateTime.now()).build();
         BDDMockito.when(heroeRepository.createHeroe(ArgumentMatchers.any())).thenReturn(novoHeroeCriado);
@@ -154,7 +161,7 @@ class HeroeControllerTest {
     @Test
     void atualizeQuandoforUmSucesso() throws Exception {
         BDDMockito.when(dataRepository.getHEROES()).thenReturn(heroe);
-        var request = readResource("heroe/put-request-heroe-200.json");
+        var request = fileUtils.fileLoader("heroe/put-request-heroe-200.json");
 
         mockMvc.perform(MockMvcRequestBuilders
                         .put("/v1/heroe")
@@ -168,7 +175,7 @@ class HeroeControllerTest {
     @Test
     void respostaSeNaoExistir() throws Exception {
         BDDMockito.when(dataRepository.getHEROES()).thenReturn(heroe);
-        var request = readResource("heroe/put-request-heroe-404.json");
+        var request = fileUtils.fileLoader("heroe/put-request-heroe-404.json");
 
         mockMvc.perform(MockMvcRequestBuilders
                         .put("/v1/heroe")
@@ -203,9 +210,73 @@ class HeroeControllerTest {
 
     }
 
-    private String readResource(String fileName) throws IOException {
-        var file = resourceLoader.getResource("classpath:%s".formatted(fileName)).getFile();
-        return new String(Files.readAllBytes(file.toPath()));
+    @ParameterizedTest
+    @MethodSource("postErrors")
+    @DisplayName("@DisplayName(POST v1/Heroe salva quando for um sucesso")
+    void salvamentoNaoFeitoPorEstarInvalido(String fileName, String errors) throws Exception {
+        var request = fileUtils.fileLoader("heroe/%s".formatted(fileName));
+
+        var novoHeroeCriado = Heroe.builder().id(99L).nome("Nagato").atDate(LocalDateTime.now()).build();
+        BDDMockito.when(heroeRepository.createHeroe(ArgumentMatchers.any())).thenReturn(novoHeroeCriado);
+
+
+        var mvcResult = mockMvc.perform(MockMvcRequestBuilders
+                        .post("/v1/heroe")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andReturn();
+
+        var resolvedException = mvcResult.getResolvedException();
+
+        Assertions.assertThat(resolvedException).isNotNull();
+
+        Assertions.assertThat(resolvedException.getMessage()).contains(errors);
+
     }
+
+    @ParameterizedTest
+    @MethodSource("putError")
+    void derErroQuandoOAtualizarEstiverInvalido(String fileName, List<String> erros) throws Exception {
+        BDDMockito.when(dataRepository.getHEROES()).thenReturn(heroe);
+        var request = fileUtils.fileLoader("heroe/%s".formatted(fileName));
+
+        var mvcResult = mockMvc.perform(MockMvcRequestBuilders
+                        .put("/v1/heroe")
+                        .content(request)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andReturn();
+
+        var resolvedException = mvcResult.getResolvedException();
+
+        Assertions.assertThat(resolvedException).isNotNull();
+        Assertions.assertThat(resolvedException.getMessage()).contains(erros);
+
+    }
+
+    private static Stream<Arguments> putError(){
+        var idNulo = "Id não pode ser nulo";
+        var nomeEmBranco = "nome não pode ficar em branco";
+
+        var erro = List.of(idNulo, nomeEmBranco);
+
+        return Stream.of(Arguments.of("put-request-heroe-blank-400.json", erro),
+                Arguments.of("put-request-heroe-empty-400.json", erro));
+    }
+
+    private static Stream<Arguments> postErrors(){
+        var nomeInvalido = "Não pode ficar nulo";
+
+        return Stream.of(
+                Arguments.of("post-request-heroe-blank-400.json",nomeInvalido),
+                Arguments.of("post-request-heroe-empty-400.json", nomeInvalido)
+        );
+    }
+
+
+    
 
 }

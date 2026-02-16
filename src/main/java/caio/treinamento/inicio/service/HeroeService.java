@@ -1,6 +1,7 @@
 package caio.treinamento.inicio.service;
 
 import caio.treinamento.inicio.entity.Heroe;
+import caio.treinamento.inicio.exceptions.NotFoundException;
 import caio.treinamento.inicio.repository.HeroeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,7 @@ public class HeroeService {
     }
 
     public Heroe listById(Long id) {
-        return heroeRepository.listById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return heroeRepository.listById(id).orElseThrow(() -> new NotFoundException("Necessario id"));
     }
 
     public Heroe create(Heroe heroe) {

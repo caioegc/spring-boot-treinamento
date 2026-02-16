@@ -1,6 +1,7 @@
 package caio.treinamento.inicio.service;
 
 import caio.treinamento.inicio.entity.Produtor;
+import caio.treinamento.inicio.exceptions.NotFoundException;
 import caio.treinamento.inicio.repository.ProdutorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,7 @@ public class ProdutorService {
     }
 
     public Produtor listById(Long id) {
-        return repository.byId(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return repository.byId(id).orElseThrow(() -> new NotFoundException("Necessário colocar o ID"));
     }
 
     public Produtor create(Produtor produtor) {

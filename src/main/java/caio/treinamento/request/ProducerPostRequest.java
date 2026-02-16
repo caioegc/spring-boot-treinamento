@@ -1,4 +1,4 @@
-package caio.treinamento.inicio.producer;
+package caio.treinamento.request;
 
 
 import lombok.Getter;
@@ -6,6 +6,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class HeroePostRequest {
+public class ProducerPostRequest {
     private String nome;
 }
