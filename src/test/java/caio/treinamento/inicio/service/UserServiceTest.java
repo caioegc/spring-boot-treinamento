@@ -1,7 +1,7 @@
 package caio.treinamento.inicio.service;
 
 import caio.treinamento.inicio.entity.User;
-import caio.treinamento.inicio.repository.UserRepository;
+import caio.treinamento.inicio.repository.UserRepo;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,17 +16,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
-    @Mock
-    public UserRepository userRepository;
-
     @InjectMocks
     public UserService userService;
+
+    @Mock
+    public UserRepo repository;
 
     public List<User> userList = new ArrayList<>();
 
@@ -43,7 +41,7 @@ class UserServiceTest {
 
     @Test
     void listAllIfNull(){
-        BDDMockito.when(userRepository.listAll()).thenReturn(userList);
+        BDDMockito.when(repository.findAll()).thenReturn(userList);
 
         var users = userService.listUser(null);
 
@@ -55,7 +53,7 @@ class UserServiceTest {
     void listIfNameIsExist(){
         var user = userList.get(0);
 
-        BDDMockito.when(userRepository.listByName(user.getPrimeiroNome())).thenReturn(userList);
+        BDDMockito.when(repository.findByPrimeiroNome(user.getPrimeiroNome())).thenReturn(userList);
         var users = userService.listUser(user.getPrimeiroNome());
 
         Assertions.assertThat(users).isNotNull().hasSize(userList.size()).containsAll(userList);
@@ -66,7 +64,7 @@ class UserServiceTest {
     void shouldReturnUserWhenIdExists(){
         var user = userList.get(0);
 
-        BDDMockito.when(userRepository.listId(user.getId())).thenReturn(Optional.of(user));
+        BDDMockito.when(repository.findById(user.getId())).thenReturn(Optional.of(user));
 
         var user1 = userService.listById(user.getId());
 
@@ -77,7 +75,7 @@ class UserServiceTest {
     void shouldReturunUserWgenIdNoExists(){
         var user = 155555L;
 
-        BDDMockito.when(userRepository.listId(user)).thenReturn(Optional.empty());
+        BDDMockito.when(repository.findById(user)).thenReturn(Optional.empty());
 
 
         Assertions.assertThatException().isThrownBy(() -> userService.listById(user)).isInstanceOf(ResponseStatusException.class);
@@ -89,7 +87,7 @@ class UserServiceTest {
     void createUser(){
         var userCreate = User.builder().id(55L).email("CuiabaDoidao@gmail.com").primeiroNome("Reinaldo").ultimoNome("KingNaldo").build();
 
-        BDDMockito.when(userRepository.createUser(userCreate)).thenReturn(userCreate);
+        BDDMockito.when(repository.save(userCreate)).thenReturn(userCreate);
 
         var user = userService.create(userCreate);
         Assertions.assertThat(user).isEqualTo(userCreate).hasNoNullFieldsOrProperties();
@@ -98,11 +96,11 @@ class UserServiceTest {
     @Test
     void deleteUser(){
         var user = userList.get(0);
-        BDDMockito.when(userRepository.listId(user.getId())).thenReturn(Optional.of(user));
+        BDDMockito.when(repository.findById(user.getId())).thenReturn(Optional.of(user));
 
         Assertions.assertThatNoException().isThrownBy(() -> userService.detete(user.getId()));
-        BDDMockito.verify(userRepository).listId(user.getId());
-        BDDMockito.verify(userRepository).deleteUser(user);
+        BDDMockito.verify(repository).findById(user.getId());
+        BDDMockito.verify(repository).delete(user);
     }
 
 
@@ -110,7 +108,7 @@ class UserServiceTest {
     void updateUser(){
         var user = userList.get(0);
         user.setPrimeiroNome("Ana Banana");
-        BDDMockito.when(userRepository.listId(user.getId())).thenReturn(Optional.of(user));
+        BDDMockito.when(repository.findById(user.getId())).thenReturn(Optional.of(user));
 
         Assertions.assertThatNoException().isThrownBy(() -> userService.update(user));
     }

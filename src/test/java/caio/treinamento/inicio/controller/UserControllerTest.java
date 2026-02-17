@@ -3,8 +3,7 @@ package caio.treinamento.inicio.controller;
 import caio.treinamento.inicio.commons.FileUtils;
 import caio.treinamento.inicio.commons.UserUtils;
 import caio.treinamento.inicio.entity.User;
-import caio.treinamento.inicio.repository.DataUserRepository;
-import caio.treinamento.inicio.repository.UserRepository;
+import caio.treinamento.inicio.repository.UserRepo;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,20 +15,13 @@ import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -53,11 +45,9 @@ class UserControllerTest {
     @Autowired
     private FileUtils fileUtils;
 
-    @MockBean
-    private DataUserRepository data;
 
-    @SpyBean
-    private UserRepository repository;
+    @MockBean
+    private UserRepo userRepo;
 
     @Autowired
     private UserUtils userUtils;
@@ -72,7 +62,7 @@ class UserControllerTest {
     @Test
     void retorneTodosQuandoNaoTiverParametros() throws Exception {
 
-        BDDMockito.when(data.getUser()).thenReturn(userList);
+        BDDMockito.when(userRepo.findAll()).thenReturn(userList);
 
         var resource = fileUtils.fileLoader("user/user-get-response-200.json");
 
@@ -84,9 +74,11 @@ class UserControllerTest {
 
     @Test
     void retorneQuandoTiverComoParametroNome() throws Exception {
-        BDDMockito.when(data.getUser()).thenReturn(userList);
         var response = fileUtils.fileLoader("user/user-get-name-caio-response-200.json");
         var nome = "Caio";
+        var caio = userList.stream().filter(user -> user.getPrimeiroNome().equals(nome)).findFirst().orElseThrow();
+
+        BDDMockito.when(userRepo.findByPrimeiroNome(nome)).thenReturn(Collections.singletonList(caio));
 
         mockMvc.perform(MockMvcRequestBuilders.get(URL).param("nome", nome))
                 .andDo(MockMvcResultHandlers.print())
@@ -97,8 +89,9 @@ class UserControllerTest {
 
     @Test
     void retorneListaAPartirDoId() throws Exception {
-        BDDMockito.when(data.getUser()).thenReturn(userList);
         var id = 1L;
+        var user1 = userList.stream().filter(user -> user.getId().equals(id)).findFirst();
+        BDDMockito.when(userRepo.findById(id)).thenReturn(user1);
 
         var resource = fileUtils.fileLoader("user/user-get-id-response-200.json");
 
@@ -110,7 +103,6 @@ class UserControllerTest {
 
     @Test
     void retorneExceccaoQuandoIdInvalido() throws Exception {
-        BDDMockito.when(data.getUser()).thenReturn(userList);
 
         var id = 991256156l;
 
@@ -124,7 +116,7 @@ class UserControllerTest {
     void salveQuandoForValido() throws Exception {
 
         var build = User.builder().id(99L).primeiroNome("Samuel").ultimoNome("Xavier").email("samuca@gmail.com").build();
-        BDDMockito.when(repository.createUser(ArgumentMatchers.any())).thenReturn(build);
+        BDDMockito.when(userRepo.save(ArgumentMatchers.any())).thenReturn(build);
 
         var request = fileUtils.fileLoader("user/user-post-request-200.json");
         var response = fileUtils.fileLoader("user/user-post-response-201.json");
@@ -141,8 +133,11 @@ class UserControllerTest {
     @Test
     void AtualizeQuandoForValido() throws Exception {
 
-        BDDMockito.when(data.getUser()).thenReturn(userList);
         var request = fileUtils.fileLoader("user/user-put-request-200.json");
+        var id = 1L;
+
+        var user1 = userList.stream().filter(user -> user.getId().equals(id)).findFirst();
+        BDDMockito.when(userRepo.findById(id)).thenReturn(user1);
 
         mockMvc.perform(MockMvcRequestBuilders.put(URL)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -155,7 +150,6 @@ class UserControllerTest {
     @Test
     void lancarUmaExcecaoQuandoTiverErro() throws Exception {
 
-        BDDMockito.when(data.getUser()).thenReturn(userList);
         var request = fileUtils.fileLoader("user/user-put-request-erro-400.json");
 
         mockMvc.perform(MockMvcRequestBuilders.put(URL)
@@ -169,8 +163,9 @@ class UserControllerTest {
 
     @Test
     void deletarQuandoForUmSucesso() throws Exception {
-        BDDMockito.when(data.getUser()).thenReturn(userList);
         var id = 1L;
+        var user1 = userList.stream().filter(user -> user.getId().equals(id)).findFirst();
+        BDDMockito.when(userRepo.findById(id)).thenReturn(user1);
 
         mockMvc.perform(MockMvcRequestBuilders.delete(URL + "/{id}", id))
                 .andDo(MockMvcResultHandlers.print())
@@ -179,7 +174,6 @@ class UserControllerTest {
 
     @Test
     void lancarUmaExceptionQuandoTiverAlgumErro() throws Exception {
-        BDDMockito.when(data.getUser()).thenReturn(userList);
         var id = 958L;
 
         mockMvc.perform(MockMvcRequestBuilders.delete(URL + "/{id}", id))
@@ -195,7 +189,7 @@ class UserControllerTest {
         var request = fileUtils.fileLoader("user/%s".formatted(fileName));
 
         var build = User.builder().id(99L).primeiroNome("Samuel").ultimoNome("Xavier").email("samuca@gmail.com").build();
-        BDDMockito.when(repository.createUser(ArgumentMatchers.any())).thenReturn(build);
+        BDDMockito.when(userRepo.save(ArgumentMatchers.any())).thenReturn(build);
 
 
         var mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(URL)
@@ -220,7 +214,6 @@ class UserControllerTest {
     @MethodSource("argumentsInvalid")
     void AtualizeQuandoNaoForInvalido(String fileName, List<String> errors) throws Exception {
 
-        BDDMockito.when(data.getUser()).thenReturn(userList);
         var request = fileUtils.fileLoader("user/%s".formatted(fileName));
 
         var mvcResult = mockMvc.perform(MockMvcRequestBuilders.put(URL)

@@ -4,8 +4,8 @@ package caio.treinamento.inicio.mapper;
 import caio.treinamento.inicio.entity.Anime;
 
 import caio.treinamento.inicio.response.AnimeGetResponse;
-import caio.treinamento.request.AnimePostRequest;
-import caio.treinamento.request.AnimePuttRequest;
+import caio.treinamento.inicio.request.AnimePostRequest;
+import caio.treinamento.inicio.request.AnimePuttRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

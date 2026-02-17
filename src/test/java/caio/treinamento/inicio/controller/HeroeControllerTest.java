@@ -2,8 +2,10 @@ package caio.treinamento.inicio.controller;
 
 import caio.treinamento.inicio.commons.FileUtils;
 import caio.treinamento.inicio.entity.Heroe;
+import caio.treinamento.inicio.mapper.HeroeMapperImpl;
 import caio.treinamento.inicio.repository.DataRepository;
 import caio.treinamento.inicio.repository.HeroeRepository;
+import caio.treinamento.inicio.service.HeroeService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +20,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -36,12 +39,15 @@ import java.util.stream.Stream;
 
 
 @WebMvcTest(controllers = HeroeController.class)
-@ComponentScan(basePackages = "caio.treinamento.inicio") // substitui o import abaixo pois é menor, o import se tivesse muita classe ia precisar exportar uma por uma
-//@Import({HeroeMapperImpl.class, HeroeService.class, HeroeRepository.class, DataRepository.class})
+//@ComponentScan(basePackages = "caio.treinamento.inicio") // substitui o import abaixo pois é menor, o import se tivesse muita classe ia precisar exportar uma por uma
+@Import({HeroeMapperImpl.class, HeroeService.class, HeroeRepository.class, DataRepository.class})
 class HeroeControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private FileUtils fileUtils;
 
     @MockBean
     private DataRepository dataRepository;
@@ -51,8 +57,6 @@ class HeroeControllerTest {
     @MockBean
     public external.dependency.Conections connections;
 
-    @Autowired
-    private FileUtils fileUtils;
 
     @SpyBean
     private HeroeRepository heroeRepository;

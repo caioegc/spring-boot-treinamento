@@ -4,8 +4,8 @@ import caio.treinamento.inicio.mapper.ProducerMapper;
 
 import caio.treinamento.inicio.response.ProducerGetResponse;
 import caio.treinamento.inicio.service.ProdutorService;
-import caio.treinamento.request.ProducerPostRequest;
-import caio.treinamento.request.ProducerPutRequest;
+import caio.treinamento.inicio.request.ProducerPostRequest;
+import caio.treinamento.inicio.request.ProducerPutRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

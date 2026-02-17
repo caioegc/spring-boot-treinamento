@@ -1,4 +1,4 @@
-package caio.treinamento.request;
+package caio.treinamento.inicio.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

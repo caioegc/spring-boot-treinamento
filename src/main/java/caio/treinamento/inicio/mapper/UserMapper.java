@@ -2,14 +2,13 @@ package caio.treinamento.inicio.mapper;
 
 import caio.treinamento.inicio.entity.User;
 import caio.treinamento.inicio.response.UserResponse;
-import caio.treinamento.request.UserRequest;
-import caio.treinamento.request.UserRequestPut;
+import caio.treinamento.inicio.request.UserRequest;
+import caio.treinamento.inicio.request.UserRequestPut;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 
 import java.util.List;
-import java.util.Map;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface UserMapper {
