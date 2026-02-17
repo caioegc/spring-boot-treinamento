@@ -2,8 +2,8 @@ package caio.treinamento.inicio.controller;
 
 import caio.treinamento.inicio.commons.FileUtils;
 import caio.treinamento.inicio.entity.Heroe;
+import caio.treinamento.inicio.external.dependency.Conections;
 import caio.treinamento.inicio.mapper.HeroeMapperImpl;
-import caio.treinamento.inicio.repository.DataRepository;
 import caio.treinamento.inicio.repository.HeroeRepository;
 import caio.treinamento.inicio.service.HeroeService;
 import org.assertj.core.api.Assertions;
@@ -19,28 +19,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 
 @WebMvcTest(controllers = HeroeController.class)
 //@ComponentScan(basePackages = "caio.treinamento.inicio") // substitui o import abaixo pois é menor, o import se tivesse muita classe ia precisar exportar uma por uma
-@Import({HeroeMapperImpl.class, HeroeService.class, HeroeRepository.class, DataRepository.class})
+@Import({HeroeMapperImpl.class, HeroeService.class, HeroeRepository.class, FileUtils.class})
 class HeroeControllerTest {
 
     @Autowired
@@ -49,16 +46,9 @@ class HeroeControllerTest {
     @Autowired
     private FileUtils fileUtils;
 
-    @MockBean
-    private DataRepository dataRepository;
-
     private List<Heroe> heroe = new ArrayList<>();
 
     @MockBean
-    public external.dependency.Conections connections;
-
-
-    @SpyBean
     private HeroeRepository heroeRepository;
 
     @BeforeEach
@@ -77,7 +67,7 @@ class HeroeControllerTest {
     @Test
     @DisplayName("@DisplayName(GET v1/producers retorna uma lista com todos os produtores quando o argumento é nulo)")
     void buscarTodos_RetornaTodosHeroes_QuandoArgumentoForNulo() throws Exception {
-        BDDMockito.when(dataRepository.getHEROES()).thenReturn(heroe);
+        BDDMockito.when(heroeRepository.findAll()).thenReturn(heroe);
 
 
         var response = fileUtils.fileLoader("heroe/get-heroe-null-name-200.json");
@@ -91,10 +81,11 @@ class HeroeControllerTest {
     @Test
     @DisplayName("@DisplayName(GET v1/producers retorna uma lista com todos os produtores quando o argumento é nulo)")
     void buscarTodos_RetornaTodosHeroes_QuandoArgumentoForNul() throws Exception {
-        BDDMockito.when(dataRepository.getHEROES()).thenReturn(heroe);
+        var nome = "Sasuke";
+        var sasuke = heroe.stream().filter(heroe -> heroe.getNome().equals(nome)).findFirst().orElseThrow();
+        BDDMockito.when(heroeRepository.findByNome(nome)).thenReturn(Collections.singletonList(sasuke));
 
         var response = fileUtils.fileLoader("heroe/get-heroe-sasuke-name-200.json");
-        var nome = "Sasuke";
         mockMvc.perform(MockMvcRequestBuilders.get("/v1/heroe").param("nome", nome))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -105,10 +96,11 @@ class HeroeControllerTest {
     @Test
     @DisplayName("@DisplayName(GET v1/producers retorna uma lista com todos os produtores quando o argumento não for encontrado)")
     void buscarTodos_RetornaTodosHeroes_QuandoArgumentoNaoForEncontrado() throws Exception {
-        BDDMockito.when(dataRepository.getHEROES()).thenReturn(heroe);
 
         var response = fileUtils.fileLoader("heroe/get-heroe-x-name-200.json");
         var nome = "x";
+        var heroeList = heroe.stream().filter(heroe -> heroe.getNome().equals(nome)).findFirst();
+        BDDMockito.when(heroeRepository.findByNome(nome)).thenReturn(Collections.emptyList());
         mockMvc.perform(MockMvcRequestBuilders.get("/v1/heroe").param("nome", nome))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -119,10 +111,11 @@ class HeroeControllerTest {
     @Test
     @DisplayName("@DisplayName(GET v1/producers/{id} retorna uma lista com o heroe quando o argumentofor encontrado)")
     void buscarPorId_RetornarObjeto_QuandoArgumentoForEncontrado() throws Exception {
-        BDDMockito.when(dataRepository.getHEROES()).thenReturn(heroe);
+        var id = 1L;
+        var heroe1 = heroe.stream().filter(heroe -> heroe.getId().equals(id)).findFirst();
+        BDDMockito.when(heroeRepository.findById(id)).thenReturn(heroe1);
 
         var response = fileUtils.fileLoader("heroe/get-heroe-id-200.json");
-        var id = 1L;
         mockMvc.perform(MockMvcRequestBuilders.get("/v1/heroe/{id}", id))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -133,8 +126,9 @@ class HeroeControllerTest {
     @Test
     @DisplayName("@DisplayName(GET v1/producers/{id} retorna uma lista com o heroe quando o argumentofor encontrado)")
     void buscarPorId_RetornarErro_QuandoArgumentoNãoForEncontrado() throws Exception {
-        BDDMockito.when(dataRepository.getHEROES()).thenReturn(heroe);
         var id = 999L;
+        var heroe1 = heroe.stream().filter(heroe -> heroe.getId().equals(id)).findFirst();
+        BDDMockito.when(heroeRepository.findById(id)).thenReturn(heroe1);
         mockMvc.perform(MockMvcRequestBuilders.get("/v1/heroe/{id}", id))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
@@ -148,7 +142,7 @@ class HeroeControllerTest {
         var response = fileUtils.fileLoader("heroe/post-response-heroe-201.json");
 
         var novoHeroeCriado = Heroe.builder().id(99L).nome("Nagato").atDate(LocalDateTime.now()).build();
-        BDDMockito.when(heroeRepository.createHeroe(ArgumentMatchers.any())).thenReturn(novoHeroeCriado);
+        BDDMockito.when(heroeRepository.save(ArgumentMatchers.any())).thenReturn(novoHeroeCriado);
 
 
         mockMvc.perform(MockMvcRequestBuilders
@@ -164,7 +158,11 @@ class HeroeControllerTest {
 
     @Test
     void atualizeQuandoforUmSucesso() throws Exception {
-        BDDMockito.when(dataRepository.getHEROES()).thenReturn(heroe);
+
+        var id = 1L;
+
+        var user1 = heroe.stream().filter(heroe -> heroe.getId().equals(id)).findFirst();
+        BDDMockito.when(heroeRepository.findById(id)).thenReturn(user1);
         var request = fileUtils.fileLoader("heroe/put-request-heroe-200.json");
 
         mockMvc.perform(MockMvcRequestBuilders
@@ -178,7 +176,6 @@ class HeroeControllerTest {
 
     @Test
     void respostaSeNaoExistir() throws Exception {
-        BDDMockito.when(dataRepository.getHEROES()).thenReturn(heroe);
         var request = fileUtils.fileLoader("heroe/put-request-heroe-404.json");
 
         mockMvc.perform(MockMvcRequestBuilders
@@ -192,8 +189,10 @@ class HeroeControllerTest {
 
     @Test
     void deleteQuandoForUmSucesso() throws Exception {
-        BDDMockito.when(dataRepository.getHEROES()).thenReturn(heroe);
-        var id = heroe.get(0).getId();
+        var id = 1L;
+        var user1 = heroe.stream().filter(heroe -> heroe.getId().equals(id)).findFirst();
+        BDDMockito.when(heroeRepository.findById(id)).thenReturn(user1);
+
         mockMvc.perform(MockMvcRequestBuilders
                         .delete("/v1/heroe/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -204,8 +203,8 @@ class HeroeControllerTest {
 
     @Test
     void deleteQuandoForUmErro() throws Exception {
-        BDDMockito.when(dataRepository.getHEROES()).thenReturn(heroe);
         var id = 151561561L;
+
         mockMvc.perform(MockMvcRequestBuilders
                         .delete("/v1/heroe/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -221,7 +220,7 @@ class HeroeControllerTest {
         var request = fileUtils.fileLoader("heroe/%s".formatted(fileName));
 
         var novoHeroeCriado = Heroe.builder().id(99L).nome("Nagato").atDate(LocalDateTime.now()).build();
-        BDDMockito.when(heroeRepository.createHeroe(ArgumentMatchers.any())).thenReturn(novoHeroeCriado);
+        BDDMockito.when(heroeRepository.save(ArgumentMatchers.any())).thenReturn(novoHeroeCriado);
 
 
         var mvcResult = mockMvc.perform(MockMvcRequestBuilders
@@ -243,7 +242,7 @@ class HeroeControllerTest {
     @ParameterizedTest
     @MethodSource("putError")
     void derErroQuandoOAtualizarEstiverInvalido(String fileName, List<String> erros) throws Exception {
-        BDDMockito.when(dataRepository.getHEROES()).thenReturn(heroe);
+
         var request = fileUtils.fileLoader("heroe/%s".formatted(fileName));
 
         var mvcResult = mockMvc.perform(MockMvcRequestBuilders

@@ -17,26 +17,26 @@ public class HeroeService {
     private final HeroeRepository heroeRepository;
 
     public List<Heroe> listAll(String nome) {
-        return nome == null ? heroeRepository.listAll() : heroeRepository.listByName(nome);
+        return nome == null ? heroeRepository.findAll() : heroeRepository.findByNome(nome);
     }
 
     public Heroe listById(Long id) {
-        return heroeRepository.listById(id).orElseThrow(() -> new NotFoundException("Necessario id"));
+        return heroeRepository.findById(id).orElseThrow(() -> new NotFoundException("Necessario id"));
     }
 
     public Heroe create(Heroe heroe) {
-        return heroeRepository.createHeroe(heroe);
+        return heroeRepository.save(heroe);
     }
 
     public void delete(Long id) {
         var byId = listById(id);
-        heroeRepository.deleteById(byId);
+        heroeRepository.delete(byId);
     }
 
     public void update(Heroe heroe) {
         listById(heroe.getId());
         heroe.setAtDate(heroe.getAtDate());
-        heroeRepository.update(heroe);
+        heroeRepository.save(heroe);
 
     }
 }

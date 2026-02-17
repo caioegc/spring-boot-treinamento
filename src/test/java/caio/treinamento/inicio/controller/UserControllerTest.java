@@ -3,6 +3,7 @@ package caio.treinamento.inicio.controller;
 import caio.treinamento.inicio.commons.FileUtils;
 import caio.treinamento.inicio.commons.UserUtils;
 import caio.treinamento.inicio.entity.User;
+import caio.treinamento.inicio.external.dependency.Conections;
 import caio.treinamento.inicio.repository.UserRepo;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,8 +33,6 @@ import java.util.stream.Stream;
 @ComponentScan(basePackages = "caio.treinamento.inicio")
 //@ActiveProfiles("test")
 class UserControllerTest {
-    @MockBean
-    public external.dependency.Conections connections;
 
     @Autowired
     private MockMvc mockMvc;

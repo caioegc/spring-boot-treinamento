@@ -17,15 +17,15 @@ public class ProdutorService {
 
     public List<Produtor> produtorList(String nome) {
 
-        return nome == null ? repository.produtorList() : repository.listByNome(nome);
+        return nome == null ? repository.findAll() : repository.findByNome(nome);
     }
 
     public Produtor listById(Long id) {
-        return repository.byId(id).orElseThrow(() -> new NotFoundException("Necessário colocar o ID"));
+        return repository.findById(id).orElseThrow(() -> new NotFoundException("Necessário colocar o ID"));
     }
 
     public Produtor create(Produtor produtor) {
-        return repository.create(produtor);
+        return repository.save(produtor);
     }
 
     public void delete(Long id) {
@@ -36,6 +36,6 @@ public class ProdutorService {
     public void update(Produtor produtor) {
         var produtor1 = listById(produtor.getId());
         produtor.setCreatedAt(produtor1.getCreatedAt());
-        repository.update(produtor);
+        repository.save(produtor);
     }
 }

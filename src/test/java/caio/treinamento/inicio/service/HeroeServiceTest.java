@@ -49,7 +49,7 @@ class HeroeServiceTest {
     @Test
     void returnNullListAll(){
 
-        BDDMockito.when(heroeRepository.listAll()).thenReturn(list);
+        BDDMockito.when(heroeRepository.findAll()).thenReturn(list);
 
         var heroes = heroeService.listAll(null);
 
@@ -63,7 +63,7 @@ class HeroeServiceTest {
        var resourceByHeroe = list.get(0);
        var listByName = singletonList(resourceByHeroe);
 
-       BDDMockito.when(heroeRepository.listByName(resourceByHeroe.getNome())).thenReturn(listByName);
+       BDDMockito.when(heroeRepository.findByNome(resourceByHeroe.getNome())).thenReturn(listByName);
 
         var heroes = heroeService.listAll(resourceByHeroe.getNome());
 
@@ -74,7 +74,7 @@ class HeroeServiceTest {
     @Test
     void returnListByEmpty(){
         var nome = "vazio";
-        BDDMockito.when(heroeRepository.listByName(nome)).thenReturn(emptyList());
+        BDDMockito.when(heroeRepository.findByNome(nome)).thenReturn(emptyList());
 
         var heroes = heroeService.listAll(nome);
 
@@ -84,7 +84,7 @@ class HeroeServiceTest {
     @Test
     void returnById(){
         var heroe = list.get(0);
-        BDDMockito.when(heroeRepository.listById(heroe.getId())).thenReturn(Optional.of(heroe));
+        BDDMockito.when(heroeRepository.findById(heroe.getId())).thenReturn(Optional.of(heroe));
 
         var heroe1 = heroeService.listById(heroe.getId());
         Assertions.assertThat(heroe1).isEqualTo(heroe);
@@ -95,7 +95,7 @@ class HeroeServiceTest {
     @Test
     void returnByIdException(){
         var heroe = list.get(0);
-        BDDMockito.when(heroeRepository.listById(heroe.getId())).thenReturn(Optional.empty());
+        BDDMockito.when(heroeRepository.findById(heroe.getId())).thenReturn(Optional.empty());
 
         Assertions.assertThatException().isThrownBy(() -> heroeService.listById(heroe.getId()));
     }
@@ -104,7 +104,7 @@ class HeroeServiceTest {
     void create(){
         var heroeCreate = Heroe.builder().id(5L).nome("Caio").atDate(LocalDateTime.now()).build();
 
-        BDDMockito.when(heroeRepository.createHeroe(heroeCreate)).thenReturn(heroeCreate);
+        BDDMockito.when(heroeRepository.save(heroeCreate)).thenReturn(heroeCreate);
 
         var heroe = heroeService.create(heroeCreate);
         Assertions.assertThat(heroe).isEqualTo(heroeCreate).hasNoNullFieldsOrProperties();
@@ -113,8 +113,7 @@ class HeroeServiceTest {
     @Test
     void deleteById(){
         var heroe = list.get(0);
-        BDDMockito.when(heroeRepository.listById(heroe.getId())).thenReturn(Optional.of(heroe));
-        BDDMockito.doNothing().when(heroeRepository).deleteById(heroe);
+        BDDMockito.when(heroeRepository.findById(heroe.getId())).thenReturn(Optional.of(heroe));
 
         Assertions.assertThatNoException().isThrownBy(() -> heroeService.delete(heroe.getId()));
     }
@@ -122,7 +121,7 @@ class HeroeServiceTest {
     @Test
     void deleteByIdCaseException(){
         var heroe = list.get(0);
-        BDDMockito.when(heroeRepository.listById(heroe.getId())).thenReturn(Optional.empty());
+        BDDMockito.when(heroeRepository.findById(heroe.getId())).thenReturn(Optional.empty());
 
         Assertions.assertThatException().isThrownBy(() -> heroeService.delete(heroe.getId()));
     }
@@ -131,7 +130,7 @@ class HeroeServiceTest {
     void updateById(){
         var heroe = list.get(0);
         heroe.setNome("Caio");
-        BDDMockito.when(heroeRepository.listById(heroe.getId())).thenReturn(Optional.of(heroe));
+        BDDMockito.when(heroeRepository.findById(heroe.getId())).thenReturn(Optional.of(heroe));
 
         Assertions.assertThatNoException().isThrownBy(()-> heroeService.update(heroe));
     }
@@ -140,7 +139,7 @@ class HeroeServiceTest {
     void updateByIdCaseExpection(){
         var heroe = list.get(0);
         heroe.setNome("Caio");
-        BDDMockito.when(heroeRepository.listById(heroe.getId())).thenReturn(Optional.empty());
+        BDDMockito.when(heroeRepository.findById(heroe.getId())).thenReturn(Optional.empty());
 
         Assertions.assertThatException().isThrownBy(()-> heroeService.update(heroe)).isInstanceOf(ResponseStatusException.class);
     }
