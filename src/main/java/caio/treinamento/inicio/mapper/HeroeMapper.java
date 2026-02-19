@@ -12,8 +12,7 @@ import java.util.List;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface HeroeMapper {
-    @Mapping(target = "id", expression = "java(java.util.concurrent.ThreadLocalRandom.current().nextLong(1000))")
-    @Mapping(target = "atDate", expression = "java(java.time.LocalDateTime.now())")
+
     Heroe toHeroe(HeroePostRequest heroePostRequest);
 
     Heroe toHeroe(HeroePutRequest heroePutRequest);
