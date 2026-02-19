@@ -4,6 +4,8 @@ import caio.treinamento.inicio.entity.Heroe;
 import caio.treinamento.inicio.exceptions.NotFoundException;
 import caio.treinamento.inicio.repository.HeroeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,6 +20,10 @@ public class HeroeService {
 
     public List<Heroe> listAll(String nome) {
         return nome == null ? heroeRepository.findAll() : heroeRepository.findByNome(nome);
+    }
+
+    public Page<Heroe> listAllPage(Pageable page) {
+        return heroeRepository.findAll(page);
     }
 
     public Heroe listById(Long id) {
